@@ -1,7 +1,9 @@
 "use client";
 
-import { addTodo } from "@/actions/add-todos-actiont";
+import { addTodo, deleteOneTodo } from "@/actions/add-todos-actiont";
 import React, { useOptimistic } from "react";
+import DeleteTodo from "./delete-todo";
+import { useFormState, useFormStatus } from "react-dom";
 
 type Todo = {
   _id: string;
@@ -13,28 +15,9 @@ type TodosComponentProps = {
 };
 
 const TodosComponent = ({ todos }: TodosComponentProps) => {
-  const [optimisticTodos, addOptimisticTodos] = useOptimistic(
-    todos,
-    (state, newTodo: Todo) => {
-      return [...state, newTodo];
-    }
-  );
-
   return (
     <>
-      <form
-        action={async (formData) => {
-          const title = formData.get("title");
-
-          addOptimisticTodos({
-            _id: ("" + Math.random()) as string,
-            title: title as string,
-          });
-
-          await addTodo(formData);
-        }}
-        className="flex flex-col w-[300px] my-16"
-      >
+      <form action={addTodo} className="flex flex-col w-[300px] my-16">
         <input
           type="text"
           name="title"
@@ -48,12 +31,13 @@ const TodosComponent = ({ todos }: TodosComponentProps) => {
       </form>
 
       <ul className="space-y-4">
-        {optimisticTodos.map((todo) => (
+        {todos.map((todo) => (
           <li
-            className="w-full px-6 py-2 bg-blue-300 rounded text-white "
+            className="w-full min-w-[300px] flex justify-between items-center px-2 py-2 bg-blue-300 rounded text-white "
             key={todo._id}
           >
             {todo.title}
+            <DeleteTodo id={todo._id} />
           </li>
         ))}
       </ul>
